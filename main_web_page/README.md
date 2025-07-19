@@ -2,10 +2,6 @@
 
 Welcome to **Sumit Playz Arcade** — a collection of 10 fun games made by me using HTML, CSS, and JavaScript.
 
-##    Video Demo
-    - https://youtu.be/RantVOwUubE
----
-
 ## 🕹️ Included Games
 
 1. Tic Tac Toe (with AI)
