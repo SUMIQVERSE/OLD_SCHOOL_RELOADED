@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="UTF-8" />
+        <title>MEMORY CARD FLIP</title>
+        <link rel="icon" type="image/png" href="favicon.png"> 
+        <style>
+            body {
+            background: #111;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            }
+            h1 {
+            margin-bottom: 10px;
+            }
+            #stats {
+            font-size: 18px;
+            margin-bottom: 15px;
+            }
+            #board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-gap: 10px;
+            justify-content: center;
+            margin: 0 auto;
+            }
+            .card {
+            width: 100px;
+            height: 100px;
+            perspective: 1000px;
+            cursor: pointer;
+            }
+            .inner {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+            }
+            .flipped .inner {
+            transform: rotateY(180deg);
+            }
+            .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            }
+            .front {
+            background: #555;
+            }
+            .back {
+            background: #fff;
+            color: black;
+            transform: rotateY(180deg);
+            }
+            #win-message {
+            display: none;
+            margin: 20px;
+            font-size: 20px;
+            color: lime;
+            }
+            button {
+            margin-top: 15px;
+            padding: 8px 16px;
+            font-size: 16px;
+            background: #28a745;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+    <h1>🧠 Memory Card Flip</h1>
+    <div id="stats">Moves: <span id="moves">0</span> | Time: <span id="time">0</span>s</div>
+    <div id="win-message">🎉 You won!</div>
+    <div id="board"></div>
+    <button onclick="startGame()">🔁 Restart</button>
+
+    <script>
+        const board = document.getElementById("board");
+        const movesEl = document.getElementById("moves");
+        const timeEl = document.getElementById("time");
+        const winMsg = document.getElementById("win-message");
+
+        const emojis = ['🐶','🐱','🦊','🐸','🦁','🐼','🐨','🐵'];
+
+        let first = null, second = null, lock = false;
+        let moves = 0, time = 0, matched = 0, timer;
+
+        function createCard(value) {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.dataset.value = value;
+
+        const inner = document.createElement("div");
+        inner.classList.add("inner");
+
+        const front = document.createElement("div");
+        front.classList.add("front");
+
+        const back = document.createElement("div");
+        back.classList.add("back");
+        back.textContent = value;
+
+        inner.appendChild(front);
+        inner.appendChild(back);
+        card.appendChild(inner);
+
+        card.addEventListener("click", () => {
+        if (lock || card.classList.contains("flipped")) return;
+
+        card.classList.add("flipped");
+
+        if (!first) {
+            first = card;
+            if (moves === 0) startTimer();
+        } else {
+            second = card;
+            lock = true;
+            moves++;
+            movesEl.textContent = moves;
+
+            if (first.dataset.value === second.dataset.value) {
+                matched++;
+                reset();
+                if (matched === emojis.length) {
+                    clearInterval(timer);
+                    winMsg.style.display = "block";
+                }
+            } else {
+                setTimeout(() => {
+                    first.classList.remove("flipped");
+                    second.classList.remove("flipped");
+                    reset();
+                }, 800);
+            }
+        }
+        });
+
+        return card;
+    }
+
+    function startGame() {
+        board.innerHTML = "";
+        moves = 0;
+        time = 0;
+        matched = 0;
+        movesEl.textContent = "0";
+        timeEl.textContent = "0";
+        clearInterval(timer);
+        winMsg.style.display = "none";
+
+        const shuffled = shuffle([...emojis, ...emojis]);
+        shuffled.forEach(emoji => {
+        const card = createCard(emoji);
+        board.appendChild(card);
+        });
+    }
+
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function reset() {
+        [first, second] = [null, null];
+        lock = false;
+    }
+
+    function startTimer() {
+        timer = setInterval(() => {
+        time++;
+        timeEl.textContent = time;
+        }, 1000);
+    }
+
+        startGame();
+    </script>
+    </body>
+</html>

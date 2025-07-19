@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>𝕄𝔸𝕀ℕ ℙ𝔸𝔾𝔼</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        /* General Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Copperplate', fantasy;
+            background-color: #111;
+            color: #fff;
+        }
+
+        a {
+            text-decoration: none;
+            color: white; /* or any color that fits your theme */
+        }
+
+        a:hover {
+            text-shadow: 0 0 5px cyan;
+            transform: scale(1.05);
+        }
+
+        /* Header Section */
+        .heading-wrapper {
+            background-color: #000000; /* Light grey background */
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .gradient-heading {
+            font-size: 38px;
+            font-family: 'Copperplate', fantasy;
+            background: linear-gradient(90deg, #00f2ff, #0e025e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0);
+            transform: scale(1.2, 2.2);                                        
+        }
+
+        /* Button Layout */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 50px auto;
+        }
+
+        .game-button {
+            width: 250px;
+            height: 200px;
+            font-size: 16px;
+            color: #fff;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            text-shadow: 1px 1px 3px black;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 0 8px #0f0f0f;
+        }
+
+        .game-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00ffff;
+        }
+
+        /* Background Images - Replace with your real paths */
+        #tic-tac-toe { background-image: url('images/tictactoe.png'); }
+        #flappy-bird { background-image: url('images/flappybird.png'); } 
+        #game-2048   { background-image: url('images/2048.png'); }
+        #snake       { background-image: url('images/snake.png'); }
+        #memory      { background-image: url('images/memory.png'); }
+        #typing      { background-image: url('images/typing.png'); }
+        #rps         { background-image: url('images/rps.png'); }
+        #pong        { background-image: url('images/pong.png'); }
+        #guess       { background-image: url('images/guess.png'); }
+        #whack       { background-image: url('images/whack.png'); }
+    </style>   
+</head>
+<body>       
+
+    <!-- Gradient Header Section -->
+    <div class="heading-wrapper">
+        <h1 class="gradient-heading">CHOOSE THE GAME YOU WANT TO PLAY</h1>
+    </div>
+
+    <hr>
+
+    <!-- Game Buttons -->
+    <div class="button-container" >
+        <a href="tic tak toe/index.html"><button class="game-button" id="tic-tac-toe">TIC TAC TOE</button></a>
+        <a href="parrot.html"><button class="game-button" id="flappy-bird">FLAPPY BIRD</button></a>
+        <a href="2048.html"><button class="game-button" id="game-2048">2048</button></a>
+        <a href="snake.html"><button class="game-button" id="snake">SNAKE</button></a>
+        <a href="MemoryCardFlip.html"><button class="game-button" id="memory">MEMORY CARD FLIP</button></a>
+
+        <a href="TypingSpeed.html"><button class="game-button" id="typing">TYPING SPEED</button></a>
+        <a href="rock paper scissor.html"><button class="game-button" id="rps">ROCK PAPER SCISSORS</button></a>
+        <a href="pong.html"><button class="game-button" id="pong">PONG</button></a>
+        <a href="GuesstheNumber.html"><button class="game-button" id="guess">GUESS THE NUMBER</button></a>
+        <a href="wackamole.html"><button class="game-button" id="whack">WHACK A MOLE</button></a>
+    </div>
+
+
+</body>
+</html>
+
+

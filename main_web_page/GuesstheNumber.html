@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>GUESS THE NUMBER</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: #fff;
+        text-align: center;
+        padding: 50px;
+        }
+
+        h1 {
+        margin-bottom: 20px;     
+        }
+
+        input[type="number"] {
+        padding: 10px;
+        font-size: 16px;
+        width: 80px;
+        border: none;
+        border-radius: 5px;
+        margin: 10px;
+        }
+
+        button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+        }
+
+        #message {
+        font-size: 22px;
+        margin-top: 20px;
+        min-height: 30px;
+        }
+
+        #attempts, #best, #timer {
+        margin-top: 10px;
+        font-size: 16px;
+        color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Guess the Number (1–100)</h1>
+
+    <input type="number" id="guessInput" min="1" max="100" placeholder="?" />
+    <button onclick="checkGuess()">Guess</button>
+    <button onclick="resetGame()">🔁 Restart</button>
+
+    <div id="message">Start guessing!</div>
+    <div id="attempts">Attempts: 0</div>
+    <div id="best">Best Score: --</div>
+    <div id="timer">⏱ Time Left: 60s</div>
+
+    <!-- Sound Effects -->
+    <audio id="winSound" src="https://actions.google.com/sounds/v1/cartoon/concussive_hit_guitar_boing.ogg"></audio>
+    <audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+    <audio id="endSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+
+    <script>
+    // Initial values
+    let randomNumber;
+    let attempts;
+    let bestScore = localStorage.getItem('bestScore') || "--";
+    let gameOver = false;
+    let timer;
+    let timeLeft = 60;
+
+    // DOM elements
+    const message = document.getElementById("message");
+    const attemptsEl = document.getElementById("attempts");
+    const bestEl = document.getElementById("best");
+    const timerEl = document.getElementById("timer");
+
+    // Sounds
+    const winSound = document.getElementById("winSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const endSound = document.getElementById("endSound");
+
+    // Start countdown
+    function startTimer() {
+        timeLeft = 60;
+        timerEl.textContent = `⏱ Time Left: ${timeLeft}s`;
+        timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `⏱ Time Left: ${timeLeft}s`;
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                message.textContent = `⏳ Time's up! The number was ${randomNumber}`;
+                gameOver = true;
+                endSound.play();
+            }
+        }, 1000);
+    }
+
+        // Guess checker
+        function checkGuess() {
+        if (gameOver) return;
+
+        const guess = Number(document.getElementById("guessInput").value);
+
+        if (!guess || guess < 1 || guess > 100) {
+            message.textContent = "⛔ Enter a number between 1 and 100!";
+            return;
+        }
+
+        attempts++;
+        attemptsEl.textContent = `Attempts: ${attempts}`;
+
+        if (guess === randomNumber) {
+            message.textContent = `🎉 Correct! The number was ${randomNumber}.`;
+            winSound.play();
+            gameOver = true;
+            clearInterval(timer);
+
+            if (bestScore === "--" || attempts < bestScore) {
+                bestScore = attempts;
+                localStorage.setItem('bestScore', bestScore);
+            }
+
+            bestEl.textContent = `Best Score: ${bestScore}`;
+        } else {
+            wrongSound.play();
+            message.textContent = guess < randomNumber ? "📉 Too low!" : "📈 Too high!";
+        }
+        }
+
+        // Reset everything
+        function resetGame() {
+          randomNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            gameOver = false;
+            document.getElementById("guessInput").value = "";
+            message.textContent = "Start guessing!";
+            attemptsEl.textContent = "Attempts: 0";
+            bestEl.textContent = `Best Score: ${bestScore}`;
+            clearInterval(timer);
+            startTimer();
+        }
+
+        // Start the game on page load
+        resetGame();
+    </script>
+</body>
+</html>
+        

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>SNAKE</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: #fff;
+        text-align: center;
+        margin: 0;
+    }
+
+    h1 {
+        margin: 20px;
+    }
+
+    #controls {
+        margin: 10px;
+    }
+
+    select, button {
+        padding: 10px 15px;
+        font-size: 16px;
+        margin: 5px;
+    }
+
+    #scoreboard {
+        margin: 10px;
+            font-size: 18px;
+    }
+
+    #gameOver {
+        display: none;
+        font-size: 24px;
+        color: red;
+        margin: 10px 0;
+    }
+
+    #gameContainer {
+        margin: 0 auto;
+        border: 2px solid #fff;
+        width: 400px;
+        height: 400px;
+        background-color: #222;
+        position: relative;
+    }
+    </style>
+</head>
+<body>
+    <h1>🐍 Snake Game</h1>
+
+    <div id="controls">
+        <label for="difficulty">Difficulty:</label>
+        <select id="difficulty">
+        <option value="200">Easy</option>
+        <option value="120" selected>Medium</option>
+        <option value="80">Hard</option>
+        </select>
+        <button onclick="startGame()">🔁 Start Game</button>
+    </div>
+
+    <div id="scoreboard">
+        Score: <span id="score">0</span> |
+        High Score: <span id="highScore">0</span>
+    </div>
+
+    <div id="gameOver">💀 Game Over!</div>
+    <div id="gameContainer"></div>
+
+    <!-- Sound Effects -->
+    <audio id="eatSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_398fd5a5b4.mp3?filename=correct-2-46134.mp3"></audio>
+    <audio id="deadSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_22f5bcd97f.mp3?filename=game-over-arcade-6435.mp3"></audio>
+
+    <script>
+        const tileSize = 20;
+        const canvasSize = 20; // 20 x 20 grid
+        const container = document.getElementById('gameContainer');
+        const scoreEl = document.getElementById('score');
+        const highScoreEl = document.getElementById('highScore');
+        const gameOverEl = document.getElementById('gameOver');
+        const eatSound = document.getElementById('eatSound');
+        const deadSound = document.getElementById('deadSound');
+        const difficultySelect = document.getElementById('difficulty');
+
+        let snake, direction, food, score, interval, gameSpeed;
+        let highScore = localStorage.getItem('snakeHighScore') || 0;
+        highScoreEl.textContent = highScore;
+
+        function createTile(x, y, color) {
+            const tile = document.createElement('div');
+            tile.style.position = 'absolute';
+            tile.style.width = tileSize + 'px';
+            tile.style.height = tileSize + 'px';
+            tile.style.left = x * tileSize + 'px';
+            tile.style.top = y * tileSize + 'px';
+            tile.style.background = color;
+            return tile;
+        }
+
+        function draw() {
+            container.innerHTML = '';
+            snake.forEach(part => container.appendChild(createTile(part.x, part.y, '#0f0')));
+            container.appendChild(createTile(food.x, food.y, 'red'));
+        }
+
+        function placeFood() {
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * canvasSize);
+                y = Math.floor(Math.random() * canvasSize);
+            } while (snake.some(p => p.x === x && p.y === y));
+            return { x, y };
+        }
+
+        function moveSnake() {
+            const head = { ...snake[0] };
+            if (direction === 'left') head.x--;
+            if (direction === 'right') head.x++;
+            if (direction === 'up') head.y--;
+            if (direction === 'down') head.y++;
+
+          // Game Over Conditions
+        if (
+            head.x < 0 || head.x >= canvasSize ||
+            head.y < 0 || head.y >= canvasSize ||
+            snake.some(p => p.x === head.x && p.y === head.y)
+        ) {
+            clearInterval(interval);
+            gameOverEl.style.display = 'block';
+            let dead = deadSound.cloneNode();
+            dead.play();
+            return;
+        }
+
+        snake.unshift(head);
+
+          // Food Eaten
+        if (head.x === food.x && head.y === food.y) {
+            score++;
+            let eat = eatSound.cloneNode();
+            eat.play();
+            food = placeFood();
+        } else {
+            snake.pop();
+        }
+
+        // Score Updates
+        scoreEl.textContent = score;
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('snakeHighScore', highScore);
+            highScoreEl.textContent = highScore;
+        }
+
+        draw();
+        }
+
+        function startGame() {
+        snake = [{ x: 10, y: 10 }];
+        direction = 'right';
+        food = placeFood();
+        score = 0;
+        gameSpeed = parseInt(difficultySelect.value);
+        gameOverEl.style.display = 'none';
+        scoreEl.textContent = 0;
+        draw();
+        clearInterval(interval);
+        interval = setInterval(moveSnake, gameSpeed);
+        }
+
+    document.addEventListener('keydown', e => {
+        const key = e.key;
+        if (key === 'ArrowUp' && direction !== 'down') direction = 'up';
+        if (key === 'ArrowDown' && direction !== 'up') direction = 'down';
+        if (key === 'ArrowLeft' && direction !== 'right') direction = 'left';
+        if (key === 'ArrowRight' && direction !== 'left') direction = 'right';
+    });
+    </script>
+</body>
+</html>             

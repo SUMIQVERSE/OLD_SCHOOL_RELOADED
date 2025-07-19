@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WHACK A MOLE 🐹</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .scoreboard {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 15px;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .hole {
+      width: 100px;
+      height: 100px;
+      background: #333;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .mole {
+      font-size: 50px;
+      position: absolute;
+      top: 100%;
+      left: 20px;
+      transition: top 0.2s;
+      user-select: none;
+    }
+
+    .up {
+      top: 10px;
+    }
+
+    #popup {
+      display: none;
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      border: 2px solid #fff;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 20px;
+    }
+
+    select, button {
+      padding: 8px 15px;
+      font-size: 16px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      background: #28a745;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🐹 Whack-a-Mole</h1>
+
+  <div class="scoreboard">
+    Score: <span id="score">0</span> |
+    High Score: <span id="highscore">0</span> |
+    Time: <span id="time">30</span>s
+  </div>
+
+  <div>
+    Difficulty:
+    <select id="difficulty">
+      <option value="easy">Easy</option>
+      <option value="medium" selected>Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+    <button onclick="startGame()">Start / Restart</button>
+  </div>
+
+  <div class="grid">
+    <div class="hole"><div class="mole">🐹</div></div>
+    <div class="hole"><div class="mole">🐹</div></div>
+    <div class="hole"><div class="mole">🐹</div></div>
+    <div class="hole"><div class="mole">🐹</div></div>
+    <div class="hole"><div class="mole">🐹</div></div>
+    <div class="hole"><div class="mole">🐹</div></div>
+  </div>
+
+  <div id="popup"></div>
+
+  <!-- Sound -->
+  <audio id="hitSound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
+  <audio id="endSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+
+  <script>
+    const holes = document.querySelectorAll('.hole');
+    const moles = document.querySelectorAll('.mole');
+    const scoreDisplay = document.getElementById('score');
+    const highScoreDisplay = document.getElementById('highscore');
+    const timeDisplay = document.getElementById('time');
+    const popup = document.getElementById('popup');
+    const hitSound = document.getElementById('hitSound');
+    const endSound = document.getElementById('endSound');
+
+    let lastHole;
+    let score = 0;
+    let timeUp = false;
+    let time = 30;
+    let gameTimer;
+    let highScore = localStorage.getItem('whackHigh') || 0;
+
+    highScoreDisplay.textContent = highScore;
+
+    function randomTime(min, max) {
+      return Math.round(Math.random() * (max - min) + min);
+    }
+
+    function randomHole() {
+      const idx = Math.floor(Math.random() * holes.length);
+      const hole = holes[idx];
+      if (hole === lastHole) return randomHole();
+      lastHole = hole;
+      return hole;
+    }
+
+    function peep() {
+      const difficulty = document.getElementById("difficulty").value;
+      let timeRange = difficulty === "easy" ? [800, 1300] :
+                      difficulty === "medium" ? [500, 1000] :
+                      [300, 700];
+
+      const time = randomTime(...timeRange);
+      const hole = randomHole();
+      const mole = hole.querySelector('.mole');
+
+      mole.classList.add('up');
+
+      setTimeout(() => {
+        mole.classList.remove('up');
+        if (!timeUp) peep();
+      }, time);
+    }
+
+    function startGame() {
+      score = 0;
+      scoreDisplay.textContent = score;
+      time = 30;
+      timeUp = false;
+      popup.style.display = "none";
+      timeDisplay.textContent = time;
+
+      moles.forEach(m => m.classList.remove('up'));
+
+      clearInterval(gameTimer);
+      peep();
+
+      gameTimer = setInterval(() => {
+        time--;
+        timeDisplay.textContent = time;
+        if (time <= 0) {
+          clearInterval(gameTimer);
+          timeUp = true;
+
+          // Make sure all moles go down
+          moles.forEach(m => m.classList.remove('up'));
+
+          setTimeout(() => {
+            let end = endSound.cloneNode();
+            end.play();
+
+            if (score > highScore) {
+              highScore = score;
+              localStorage.setItem('whackHigh', highScore);
+            }
+            highScoreDisplay.textContent = highScore;
+            popup.innerHTML = `⏱ Game Over!<br>🎯 Score: ${score}<br>🏆 Best: ${highScore}`;
+            popup.style.display = "block";
+          }, 400);
+        }
+      }, 1000);
+    }
+
+    moles.forEach(mole => {
+      mole.addEventListener('click', () => {
+        if (!mole.classList.contains('up')) return;
+        mole.classList.remove('up');
+        score++;
+        scoreDisplay.textContent = score;
+
+        let hit = hitSound.cloneNode();
+        hit.play();
+      });
+    });
+  </script>
+</body>
+</html>
+  

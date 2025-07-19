@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ROCK PAPER SCISSORS</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 { margin-bottom: 10px; }
+    .choices {
+      margin: 20px;
+    }
+    button.choice {
+      font-size: 24px;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background: #444;
+      color: #fff;
+    }
+    button.choice:hover {
+      background: #666;
+    }
+    #result { margin: 20px 0; font-size: 22px; min-height: 40px; }
+    #scores, #mode { font-size: 18px; margin: 10px 0; }
+    #restart {
+      margin-top: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      background: #28a745;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    select {
+      background: #333;
+      color: white;
+      padding: 5px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>✊ Rock ✋ Paper ✌️ Scissors</h1>
+
+  <div id="mode">
+    AI Difficulty:
+    <select id="difficulty" onchange="resetGame()">
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+  </div>
+
+  <div class="choices">
+    <button class="choice" onclick="play('rock')">✊ Rock</button>
+    <button class="choice" onclick="play('paper')">✋ Paper</button>
+    <button class="choice" onclick="play('scissors')">✌️ Scissors</button>
+  </div>
+
+  <div id="result">Choose your move!</div>
+
+  <div id="scores">
+    🧑 You: <span id="playerScore">0</span> |
+    🤖 Computer: <span id="computerScore">0</span>
+  </div>
+
+  <button id="restart" onclick="resetGame()">🔁 Restart</button>
+
+  <!-- Sound effects -->
+  <audio id="winSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+  <audio id="loseSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+  <audio id="drawSound" src="https://actions.google.com/sounds/v1/cartoon/slide_whistle_to_drum_hit.ogg"></audio>
+
+  <script>
+    let playerScore = 0;
+    let computerScore = 0;
+    let playerLastMove = "";
+    const winSound = document.getElementById("winSound");
+    const loseSound = document.getElementById("loseSound");
+    const drawSound = document.getElementById("drawSound");
+
+    function play(playerChoice) {
+      if (playerScore === 5 || computerScore === 5) return;
+
+      const difficulty = document.getElementById("difficulty").value;
+      const computerChoice = getComputerMove(playerChoice, difficulty);
+      playerLastMove = playerChoice;
+
+      let resultText = "";
+
+      if (playerChoice === computerChoice) {
+        resultText = `🤝 It's a draw! You both chose ${playerChoice}.`;
+        drawSound.play();
+      } else if (
+        (playerChoice === "rock" && computerChoice === "scissors") ||
+        (playerChoice === "paper" && computerChoice === "rock") ||
+        (playerChoice === "scissors" && computerChoice === "paper")
+      ) {
+        playerScore++;
+        resultText = `✅ You Win! ${playerChoice} beats ${computerChoice}`;
+        winSound.play();
+      } else {
+        computerScore++;
+        resultText = `❌ You Lose! ${computerChoice} beats ${playerChoice}`;
+        loseSound.play();
+      }
+
+      document.getElementById("result").textContent = resultText;
+      document.getElementById("playerScore").textContent = playerScore;
+      document.getElementById("computerScore").textContent = computerScore;
+
+      if (playerScore === 5 || computerScore === 5) {
+        const final = playerScore === 5 ? "🎉 YOU WIN THE MATCH!" : "💀 COMPUTER WINS!";
+        document.getElementById("result").textContent = final;
+      }
+    }
+
+    function getComputerMove(player, difficulty) {
+      const beats = {
+        rock: "paper",
+        paper: "scissors",
+        scissors: "rock"
+      };
+
+      if (difficulty === "easy") {
+        const options = ["rock", "paper", "scissors"];
+        return options[Math.floor(Math.random() * 3)];
+      }
+
+      if (difficulty === "medium") {
+        return Math.random() < 0.5
+          ? beats[player] // counters player 50%
+          : ["rock", "paper", "scissors"][Math.floor(Math.random() * 3)];
+      }
+
+      if (difficulty === "hard") {
+        return beats[player]; // always beats player
+      }
+    }
+
+    function resetGame() {
+      playerScore = 0;
+      computerScore = 0;
+      playerLastMove = "";
+      document.getElementById("playerScore").textContent = playerScore;
+      document.getElementById("computerScore").textContent = computerScore;
+      document.getElementById("result").textContent = "Choose your move!";
+    }
+  </script>
+</body>
+</html>
